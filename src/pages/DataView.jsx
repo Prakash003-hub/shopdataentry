@@ -466,16 +466,32 @@ export default function DataView() {
               onPreviewDoc={(url, name) => setPreviewDoc({ url, name })}
               onEdit={(row) => setEditingCustomer(row)}
               onStatusChange={async (id, newStatus) => {
-                await apiUpdateCustomer({ id, status: newStatus });
-                loadAllData();
-                Swal.fire({
-                  icon: 'success',
-                  title: `Status updated to ${newStatus}`,
-                  toast: true,
-                  position: 'top-end',
-                  showConfirmButton: false,
-                  timer: 1500,
-                });
+                // Optimistic UI state update (Instant 0ms screen change)
+                setCustomers((prev) =>
+                  prev.map((c) => (c.id === id ? { ...c, status: newStatus } : c))
+                );
+
+                const res = await apiUpdateCustomer({ id, status: newStatus });
+                if (res && res.success) {
+                  Swal.fire({
+                    icon: 'success',
+                    title: `Status set to ${newStatus}`,
+                    toast: true,
+                    position: 'top-end',
+                    showConfirmButton: false,
+                    timer: 1500,
+                  });
+                } else {
+                  // Revert if API failed
+                  setCustomers((prev) =>
+                    prev.map((c) => (c.id === id ? { ...c, status: newStatus === 'Success' ? 'Pending' : 'Success' } : c))
+                  );
+                  Swal.fire({
+                    icon: 'error',
+                    title: 'Update Failed',
+                    text: (res && res.message) || 'Could not update status on Google Sheets.',
+                  });
+                }
               }}
               onDelete={async (id) => {
                 await apiDeleteCustomer(id);
@@ -486,12 +502,17 @@ export default function DataView() {
         </div>
       )}
 
-      {/* Customer Detail Drawer */}
+      {/* Customer Detail Drawer (3 Dots Menu) */}
       {selectedCustomer && (
         <CustomerDrawer
           customer={selectedCustomer}
           onClose={() => setSelectedCustomer(null)}
           onPreviewDoc={(url, name) => setPreviewDoc({ url, name })}
+          onEdit={(row) => setEditingCustomer(row)}
+          onDelete={async (id) => {
+            await apiDeleteCustomer(id);
+            loadAllData();
+          }}
         />
       )}
 

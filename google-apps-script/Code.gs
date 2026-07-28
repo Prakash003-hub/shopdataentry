@@ -409,8 +409,11 @@ function updateCustomer(data) {
   var namesColNum = colMap["file names"] || 7;
   var statusColNum = colMap["status"] || 8;
 
+  var targetId = String(data.id || "").trim();
+
   for (var i = 1; i < values.length; i++) {
-    if (values[i][idCol] == data.id) {
+    var rowId = String(values[i][idCol] || values[i][0] || "").trim();
+    if (rowId === targetId) {
       if (data.name) sheet.getRange(i + 1, nameColNum).setValue(data.name);
       if (data.aadhaar !== undefined) sheet.getRange(i + 1, aadhaarColNum).setValue(data.aadhaar);
       if (data.phone) sheet.getRange(i + 1, phoneColNum).setValue(data.phone);
@@ -419,6 +422,7 @@ function updateCustomer(data) {
       if (data.fileNames) sheet.getRange(i + 1, namesColNum).setValue(JSON.stringify(data.fileNames));
       if (data.status) sheet.getRange(i + 1, statusColNum).setValue(data.status);
 
+      SpreadsheetApp.flush();
       return { success: true, message: "Customer updated" };
     }
   }

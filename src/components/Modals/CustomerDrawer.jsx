@@ -1,7 +1,8 @@
 import React from 'react';
-import { X, User, Phone, FileText, Calendar, Clock, ExternalLink, Download, MessageSquare, PhoneCall } from 'lucide-react';
+import { X, User, Phone, FileText, Calendar, Clock, ExternalLink, MessageSquare, PhoneCall, Edit2, Trash2, CheckCircle2 } from 'lucide-react';
+import Swal from 'sweetalert2';
 
-export default function CustomerDrawer({ customer, onClose, onPreviewDoc }) {
+export default function CustomerDrawer({ customer, onClose, onPreviewDoc, onEdit, onDelete }) {
   if (!customer) return null;
 
   const handleWhatsApp = () => {
@@ -12,6 +13,30 @@ export default function CustomerDrawer({ customer, onClose, onPreviewDoc }) {
   const handleCall = () => {
     window.location.href = `tel:${customer.phone}`;
   };
+
+  const handleDelete = () => {
+    Swal.fire({
+      title: 'Delete Customer Record?',
+      text: `Are you sure you want to delete customer records for ${customer.name}?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonColor: '#ef4444',
+      cancelButtonColor: '#64748b',
+      confirmButtonText: 'Yes, Delete',
+      customClass: {
+        popup: 'rounded-3xl',
+        confirmButton: 'rounded-2xl font-bold px-4 py-2',
+        cancelButton: 'rounded-2xl font-bold px-4 py-2',
+      },
+    }).then((result) => {
+      if (result.isConfirmed && onDelete) {
+        onDelete(customer.id);
+        onClose();
+      }
+    });
+  };
+
+  const isSuccess = customer.status === 'Success';
 
   return (
     <div className="fixed inset-0 z-50 flex justify-end bg-slate-900/50 backdrop-blur-xs animate-fade-in">
@@ -24,7 +49,15 @@ export default function CustomerDrawer({ customer, onClose, onPreviewDoc }) {
             </div>
             <div>
               <h2 className="text-lg font-bold text-slate-900">{customer.name || 'Customer Details'}</h2>
-              <p className="text-xs text-slate-500 font-medium">{customer.service || 'Service Record'}</p>
+              <div className="flex items-center gap-2 mt-0.5">
+                <span
+                  className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                    isSuccess ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
+                  }`}
+                >
+                  {isSuccess ? 'Success ✅' : 'Pending ⏳'}
+                </span>
+              </div>
             </div>
           </div>
           <button
@@ -56,7 +89,7 @@ export default function CustomerDrawer({ customer, onClose, onPreviewDoc }) {
           </div>
 
           {/* Details List */}
-          <div className="space-y-4">
+          <div className="space-y-3">
             <div className="flex items-start gap-3 p-3.5 rounded-2xl bg-slate-50 border border-slate-100">
               <User className="w-5 h-5 text-slate-400 mt-0.5" />
               <div>
@@ -85,44 +118,16 @@ export default function CustomerDrawer({ customer, onClose, onPreviewDoc }) {
               </div>
             )}
 
-            {customer.service && (
-              <div className="flex items-start gap-3 p-3.5 rounded-2xl bg-slate-50 border border-slate-100">
-                <FileText className="w-5 h-5 text-slate-400 mt-0.5" />
-                <div>
-                  <div className="text-[11px] font-bold text-slate-400 uppercase">Service Name</div>
-                  <div className="text-sm font-bold text-slate-800">{customer.service}</div>
-                </div>
-              </div>
-            )}
-
-            {customer.description && (
-              <div className="flex items-start gap-3 p-3.5 rounded-2xl bg-slate-50 border border-slate-100">
-                <FileText className="w-5 h-5 text-slate-400 mt-0.5" />
-                <div>
-                  <div className="text-[11px] font-bold text-slate-400 uppercase">Description / Notes</div>
-                  <div className="text-xs font-medium text-slate-700 leading-relaxed mt-1">
-                    {customer.description}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            <div className="grid grid-cols-2 gap-3">
-              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100">
-                <div className="text-[10px] font-bold text-slate-400 uppercase mb-0.5">Date</div>
-                <div className="text-xs font-bold text-slate-800">{customer.date || 'N/A'}</div>
-              </div>
-              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100">
-                <div className="text-[10px] font-bold text-slate-400 uppercase mb-0.5">Created Time</div>
-                <div className="text-xs font-bold text-slate-800">
-                  {customer.createdTime ? new Date(customer.createdTime).toLocaleTimeString() : 'N/A'}
-                </div>
+            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100">
+              <div className="text-[10px] font-bold text-slate-400 uppercase mb-0.5">Status</div>
+              <div className="text-xs font-bold text-slate-800">
+                {isSuccess ? 'Success (Completed)' : 'Pending (In Progress)'}
               </div>
             </div>
           </div>
 
           {/* Uploaded Documents List */}
-          {customer.driveUrls && customer.driveUrls.length > 0 && (
+          {customer.driveUrls && customer.driveUrls.length > 0 ? (
             <div>
               <h3 className="text-xs font-bold text-slate-700 uppercase tracking-wider mb-3">
                 Uploaded Documents ({customer.driveUrls.length})
@@ -158,7 +163,32 @@ export default function CustomerDrawer({ customer, onClose, onPreviewDoc }) {
                 })}
               </div>
             </div>
+          ) : (
+            <div className="p-4 rounded-2xl bg-slate-50 border border-slate-100 text-center text-xs text-slate-400">
+              No attached document files.
+            </div>
           )}
+
+          {/* Edit & Delete Actions inside 3 Dots Drawer */}
+          <div className="pt-2 border-t border-slate-100 grid grid-cols-2 gap-3">
+            <button
+              onClick={() => {
+                if (onEdit) onEdit(customer);
+                onClose();
+              }}
+              className="flex items-center justify-center gap-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold py-3 px-4 rounded-2xl text-xs transition-all"
+            >
+              <Edit2 className="w-4 h-4 text-green-600" />
+              <span>Edit Details</span>
+            </button>
+            <button
+              onClick={handleDelete}
+              className="flex items-center justify-center gap-2 bg-red-50 hover:bg-red-100 text-red-600 font-bold py-3 px-4 rounded-2xl text-xs transition-all border border-red-200"
+            >
+              <Trash2 className="w-4 h-4" />
+              <span>Delete</span>
+            </button>
+          </div>
         </div>
 
         {/* Footer */}

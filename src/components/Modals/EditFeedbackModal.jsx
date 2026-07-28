@@ -9,6 +9,7 @@ export default function EditFeedbackModal({ item, onClose, onUpdated }) {
   const [name, setName] = useState(item.name || '');
   const [phone, setPhone] = useState(item.phone || '');
   const [service, setService] = useState(item.service || '');
+  const [status, setStatus] = useState(item.status || 'Pending');
   const [description, setDescription] = useState(item.description || '');
   const [date, setDate] = useState(item.date || new Date().toISOString().split('T')[0]);
   const [submitting, setSubmitting] = useState(false);
@@ -26,6 +27,7 @@ export default function EditFeedbackModal({ item, onClose, onUpdated }) {
       name,
       phone,
       service,
+      status,
       description,
       date,
     });
@@ -94,15 +96,29 @@ export default function EditFeedbackModal({ item, onClose, onUpdated }) {
             </div>
           </div>
 
-          <div>
-            <label className="block text-xs font-bold text-slate-700 mb-1">Service Name</label>
-            <input
-              type="text"
-              value={service}
-              onChange={(e) => setService(e.target.value)}
-              className="w-full glass-input px-4 py-3 rounded-2xl text-sm font-semibold text-slate-800"
-              required
-            />
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Service Name</label>
+              <input
+                type="text"
+                value={service}
+                onChange={(e) => setService(e.target.value)}
+                className="w-full glass-input px-4 py-3 rounded-2xl text-sm font-semibold text-slate-800"
+                required
+              />
+            </div>
+
+            <div>
+              <label className="block text-xs font-bold text-slate-700 mb-1">Status</label>
+              <select
+                value={status}
+                onChange={(e) => setStatus(e.target.value)}
+                className="w-full glass-input px-4 py-3 rounded-2xl text-sm font-semibold text-slate-800"
+              >
+                <option value="Pending">Pending ⏳</option>
+                <option value="Success">Success ✅</option>
+              </select>
+            </div>
           </div>
 
           <div>

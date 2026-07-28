@@ -49,15 +49,17 @@ export default function CustomerDrawer({ customer, onClose, onPreviewDoc, onEdit
             </div>
             <div>
               <h2 className="text-lg font-bold text-slate-900">{customer.name || 'Customer Details'}</h2>
-              <div className="flex items-center gap-2 mt-0.5">
-                <span
-                  className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                    isSuccess ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
-                  }`}
-                >
-                  {isSuccess ? 'Success ✅' : 'Pending ⏳'}
-                </span>
-              </div>
+              {customer.status && (
+                <div className="flex items-center gap-2 mt-0.5">
+                  <span
+                    className={`inline-flex items-center gap-1 text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                      isSuccess ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800'
+                    }`}
+                  >
+                    {isSuccess ? 'Success ✅' : 'Pending ⏳'}
+                  </span>
+                </div>
+              )}
             </div>
           </div>
           <button
@@ -108,6 +110,16 @@ export default function CustomerDrawer({ customer, onClose, onPreviewDoc, onEdit
               </div>
             )}
 
+            {customer.service && (
+              <div className="flex items-start gap-3 p-3.5 rounded-2xl bg-slate-50 border border-slate-100">
+                <FileText className="w-5 h-5 text-slate-400 mt-0.5" />
+                <div>
+                  <div className="text-[11px] font-bold text-slate-400 uppercase">Service Name</div>
+                  <div className="text-sm font-bold text-slate-800">{customer.service}</div>
+                </div>
+              </div>
+            )}
+
             {customer.aadhaar && (
               <div className="flex items-start gap-3 p-3.5 rounded-2xl bg-slate-50 border border-slate-100">
                 <FileText className="w-5 h-5 text-slate-400 mt-0.5" />
@@ -118,12 +130,21 @@ export default function CustomerDrawer({ customer, onClose, onPreviewDoc, onEdit
               </div>
             )}
 
-            <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100">
-              <div className="text-[10px] font-bold text-slate-400 uppercase mb-0.5">Status</div>
-              <div className="text-xs font-bold text-slate-800">
-                {isSuccess ? 'Success (Completed)' : 'Pending (In Progress)'}
+            {customer.description && (
+              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100">
+                <div className="text-[10px] font-bold text-slate-400 uppercase mb-0.5">Description / Notes</div>
+                <div className="text-xs font-semibold text-slate-700">{customer.description}</div>
               </div>
-            </div>
+            )}
+
+            {customer.status && (
+              <div className="p-3.5 rounded-2xl bg-slate-50 border border-slate-100">
+                <div className="text-[10px] font-bold text-slate-400 uppercase mb-0.5">Status</div>
+                <div className="text-xs font-bold text-slate-800">
+                  {isSuccess ? 'Success (Completed)' : 'Pending (In Progress)'}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Uploaded Documents List */}

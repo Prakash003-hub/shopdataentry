@@ -1,29 +1,7 @@
 import React from 'react';
-import { MessageSquare, PhoneCall, MoreHorizontal, Edit2, Trash2, User } from 'lucide-react';
-import Swal from 'sweetalert2';
+import { MessageSquare, PhoneCall, MoreVertical, User, CheckCircle2, Clock } from 'lucide-react';
 
-export default function FeedbackTable({ data, onMore, onEdit, onDelete }) {
-  const handleDelete = (id, name) => {
-    Swal.fire({
-      title: 'Delete Feedback?',
-      text: `Are you sure you want to delete feedback for ${name}?`,
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#ef4444',
-      cancelButtonColor: '#64748b',
-      confirmButtonText: 'Yes, Delete',
-      customClass: {
-        popup: 'rounded-3xl',
-        confirmButton: 'rounded-2xl font-bold px-4 py-2',
-        cancelButton: 'rounded-2xl font-bold px-4 py-2',
-      },
-    }).then((result) => {
-      if (result.isConfirmed) {
-        onDelete(id);
-      }
-    });
-  };
-
+export default function FeedbackTable({ data, onMore, onStatusChange }) {
   const handleWhatsApp = (phone) => {
     const cleanPhone = phone ? phone.replace(/\D/g, '') : '';
     window.open(`https://wa.me/91${cleanPhone}`, '_blank');
@@ -31,6 +9,13 @@ export default function FeedbackTable({ data, onMore, onEdit, onDelete }) {
 
   const handleCall = (phone) => {
     window.location.href = `tel:${phone}`;
+  };
+
+  const handleToggleStatus = (row) => {
+    const nextStatus = row.status === 'Success' ? 'Pending' : 'Success';
+    if (onStatusChange) {
+      onStatusChange(row.id, nextStatus);
+    }
   };
 
   if (!data || data.length === 0) {
@@ -48,69 +33,90 @@ export default function FeedbackTable({ data, onMore, onEdit, onDelete }) {
       <table className="w-full text-left border-collapse">
         <thead>
           <tr className="border-b border-slate-200/80 bg-slate-50/70 text-[11px] font-bold text-slate-500 uppercase tracking-wider">
-            <th className="py-3.5 px-4">Customer Name</th>
-            <th className="py-3.5 px-4">Phone Number</th>
-            <th className="py-3.5 px-4">Service Name</th>
-            <th className="py-3.5 px-4 text-center">Quick Actions</th>
-            <th className="py-3.5 px-4 text-center">Manage</th>
+            <th className="py-3 px-3 sm:py-3.5 sm:px-4">Customer Name</th>
+            <th className="py-3 px-3 sm:py-3.5 sm:px-4">Service Name</th>
+            <th className="py-3 px-3 sm:py-3.5 sm:px-4 text-center">Status</th>
+            <th className="py-3 px-3 sm:py-3.5 sm:px-4 text-center">Quick Contact</th>
+            <th className="py-3 px-3 sm:py-3.5 sm:px-4 text-center">Actions</th>
           </tr>
         </thead>
         <tbody className="divide-y divide-slate-100 text-xs font-medium text-slate-800">
-          {data.map((row) => (
-            <tr key={row.id} className="hover:bg-green-50/30 transition-colors">
-              <td className="py-3.5 px-4 whitespace-nowrap font-bold text-slate-900">
-                {row.name}
-              </td>
-              <td className="py-3.5 px-4 whitespace-nowrap font-semibold text-slate-600">
-                {row.phone}
-              </td>
-              <td className="py-3.5 px-4 whitespace-nowrap font-semibold text-green-700">
-                {row.service}
-              </td>
-              <td className="py-3.5 px-4 whitespace-nowrap text-center">
-                <div className="flex items-center justify-center gap-2">
+          {data.map((row) => {
+            const isSuccess = row.status === 'Success';
+
+            return (
+              <tr key={row.id} className="hover:bg-green-50/30 transition-colors">
+                {/* 1. Customer Name */}
+                <td className="py-2.5 px-3 sm:py-3.5 sm:px-4 whitespace-nowrap font-bold text-slate-900">
+                  {row.name}
+                </td>
+
+                {/* 2. Service Name */}
+                <td className="py-2.5 px-3 sm:py-3.5 sm:px-4 whitespace-nowrap font-semibold text-green-700">
+                  {row.service}
+                </td>
+
+                {/* 3. Status Toggle Button */}
+                <td className="py-2.5 px-3 sm:py-3.5 sm:px-4 whitespace-nowrap text-center">
                   <button
-                    onClick={() => handleWhatsApp(row.phone)}
-                    className="flex items-center gap-1 bg-emerald-500 hover:bg-emerald-600 text-white font-bold py-1.5 px-3 rounded-xl text-[11px] shadow-xs transition-all"
+                    type="button"
+                    onClick={() => handleToggleStatus(row)}
+                    className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] sm:text-[11px] font-extrabold border transition-all cursor-pointer shadow-2xs active:scale-95 ${
+                      isSuccess
+                        ? 'bg-emerald-100/90 text-emerald-800 border-emerald-300/80 hover:bg-emerald-200'
+                        : 'bg-amber-100/90 text-amber-800 border-amber-300/80 hover:bg-amber-200'
+                    }`}
+                    title="Click to toggle status"
                   >
-                    <MessageSquare className="w-3.5 h-3.5" />
-                    <span>WhatsApp</span>
+                    {isSuccess ? (
+                      <>
+                        <CheckCircle2 className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-emerald-600" />
+                        <span>Success</span>
+                      </>
+                    ) : (
+                      <>
+                        <Clock className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-600" />
+                        <span>Pending</span>
+                      </>
+                    )}
                   </button>
-                  <button
-                    onClick={() => handleCall(row.phone)}
-                    className="flex items-center gap-1 bg-blue-600 hover:bg-blue-700 text-white font-bold py-1.5 px-3 rounded-xl text-[11px] shadow-xs transition-all"
-                  >
-                    <PhoneCall className="w-3.5 h-3.5" />
-                    <span>Call</span>
-                  </button>
-                </div>
-              </td>
-              <td className="py-3.5 px-4 whitespace-nowrap text-center">
-                <div className="flex items-center justify-center gap-1.5">
+                </td>
+
+                {/* 4. Quick Contact (WhatsApp & Call) */}
+                <td className="py-2.5 px-3 sm:py-3.5 sm:px-4 whitespace-nowrap text-center">
+                  <div className="flex items-center justify-center gap-1.5">
+                    <button
+                      onClick={() => handleWhatsApp(row.phone)}
+                      className="p-1.5 sm:py-1.5 sm:px-3 rounded-xl bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-[11px] shadow-2xs transition-all flex items-center gap-1"
+                      title="WhatsApp Chat"
+                    >
+                      <MessageSquare className="w-3.5 h-3.5" />
+                      <span className="hidden sm:inline">WhatsApp</span>
+                    </button>
+                    <button
+                      onClick={() => handleCall(row.phone)}
+                      className="p-1.5 sm:py-1.5 sm:px-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-[11px] shadow-2xs transition-all flex items-center gap-1"
+                      title="Call Phone"
+                    >
+                      <PhoneCall className="w-3.5 h-3.5" />
+                      <span className="hidden sm:inline">Call</span>
+                    </button>
+                  </div>
+                </td>
+
+                {/* 5. 3 Dots Action Button */}
+                <td className="py-2.5 px-3 sm:py-3.5 sm:px-4 whitespace-nowrap text-center">
                   <button
                     onClick={() => onMore(row)}
-                    className="p-1.5 rounded-xl bg-slate-100 text-slate-700 hover:bg-green-100 hover:text-green-700 transition-all font-bold text-xs flex items-center gap-1"
-                    title="View Details Drawer"
+                    className="p-1.5 rounded-xl bg-slate-100 text-slate-700 hover:bg-emerald-100 hover:text-emerald-700 transition-all font-bold text-xs inline-flex items-center justify-center"
+                    title="More details & options"
                   >
-                    <MoreHorizontal className="w-4 h-4" />
-                    <span className="hidden sm:inline">More</span>
+                    <MoreVertical className="w-4 h-4" />
                   </button>
-                  <button
-                    onClick={() => onEdit && onEdit(row)}
-                    className="p-1.5 rounded-xl text-slate-600 hover:text-green-600 hover:bg-green-50 transition-all"
-                  >
-                    <Edit2 className="w-4 h-4" />
-                  </button>
-                  <button
-                    onClick={() => handleDelete(row.id, row.name)}
-                    className="p-1.5 rounded-xl text-slate-600 hover:text-red-600 hover:bg-red-50 transition-all"
-                  >
-                    <Trash2 className="w-4 h-4" />
-                  </button>
-                </div>
-              </td>
-            </tr>
-          ))}
+                </td>
+              </tr>
+            );
+          })}
         </tbody>
       </table>
     </div>

@@ -48,7 +48,6 @@ export default function EditCustomerModal({ item, onClose, onUpdated }) {
       name,
       aadhaar,
       phone,
-      status,
       driveFileIds,
       driveUrls,
       fileNames,

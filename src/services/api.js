@@ -116,6 +116,7 @@ export const apiAddFeedback = async (record) => {
   const payload = {
     ...record,
     id,
+    status: record.status || 'Pending',
     date: record.date || getLocalDateString(),
   };
 

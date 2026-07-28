@@ -16,8 +16,10 @@ import {
   apiGetBudgetList,
   apiDeleteBudget,
   apiGetFeedbackList,
+  apiUpdateFeedback,
   apiDeleteFeedback,
   apiGetCustomerList,
+  apiUpdateCustomer,
   apiDeleteCustomer,
 } from '../services/api';
 import {
@@ -134,7 +136,21 @@ export default function DataView() {
 
   const filteredBudgets = getFilteredBudgets();
 
-  // Summary Totals
+  // Dynamic Category options extracted from datasets
+  const defaultCategories = ['Xerox', 'AEPS', 'Printout', 'e-Sevai', 'Aadhaar', 'Voter ID', 'PAN'];
+  const dynamicCategories = Array.from(
+    new Set([
+      ...defaultCategories,
+      ...budgets.map((b) => b.category).filter(Boolean),
+    ])
+  ).sort();
+
+  // Summary Totals for current Filtered Dataset
+  const filteredTotalAmount = filteredBudgets.reduce(
+    (s, b) => s + (parseFloat(b.amount) || 0),
+    0
+  );
+
   const totalIncome = filteredBudgets
     .filter((b) => b.type === 'Income')
     .reduce((s, b) => s + (parseFloat(b.amount) || 0), 0);
@@ -150,6 +166,8 @@ export default function DataView() {
   const totalFund = filteredBudgets
     .filter((b) => b.type === 'Fund')
     .reduce((s, b) => s + (parseFloat(b.amount) || 0), 0);
+
+  const filteredNetTotal = totalIncome + totalFund - totalExpense - totalInvestment;
 
   // Pagination for Budget Table
   const totalPages = Math.ceil(filteredBudgets.length / itemsPerPage) || 1;
@@ -301,13 +319,11 @@ export default function DataView() {
                   className="w-full glass-input px-3 py-2 text-xs font-semibold text-slate-800 rounded-xl"
                 >
                   <option value="all">All Categories</option>
-                  <option value="Xerox">Xerox</option>
-                  <option value="AEPS">AEPS</option>
-                  <option value="Printout">Printout</option>
-                  <option value="e-Sevai">e-Sevai</option>
-                  <option value="Aadhaar">Aadhaar</option>
-                  <option value="Voter ID">Voter ID</option>
-                  <option value="PAN">PAN</option>
+                  {dynamicCategories.map((cat) => (
+                    <option key={cat} value={cat}>
+                      {cat}
+                    </option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -329,6 +345,65 @@ export default function DataView() {
                 />
               </div>
             )}
+          </div>
+
+          {/* Dynamic Filter Calculation Summary Banner */}
+          <div className="glass-card p-4 rounded-3xl bg-white/90 backdrop-blur-md border border-slate-200/80 shadow-md space-y-3 no-print">
+            <div className="flex flex-wrap items-center justify-between gap-2 border-b border-slate-100 pb-2">
+              <div className="flex items-center gap-2">
+                <span className="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                <h3 className="text-xs font-extrabold uppercase tracking-wider text-slate-700">
+                  Filtered Dataset Live Amount Calculation
+                </h3>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] font-bold px-3 py-1 rounded-full bg-slate-100 text-slate-700 border border-slate-200">
+                  Filtered: <span className="text-emerald-600 font-extrabold">{filteredBudgets.length}</span> {filteredBudgets.length === 1 ? 'record' : 'records'}
+                </span>
+              </div>
+            </div>
+
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+              {/* 1. Total Filtered Sum */}
+              <div className="p-3.5 rounded-2xl bg-gradient-to-br from-emerald-600 via-teal-600 to-emerald-700 text-white border border-emerald-500 shadow-md shadow-emerald-600/20">
+                <span className="text-[10px] font-extrabold text-emerald-100 block mb-0.5 uppercase tracking-wider">
+                  Total Filtered Sum
+                </span>
+                <span className="text-xl font-black drop-shadow-xs">
+                  ₹{filteredTotalAmount.toLocaleString('en-IN')}
+                </span>
+              </div>
+
+              {/* 2. Filtered Income */}
+              <div className="p-3.5 rounded-2xl bg-emerald-50/80 border border-emerald-200/90 text-emerald-900 shadow-xs">
+                <span className="text-[10px] font-bold text-emerald-700 block mb-0.5 uppercase tracking-wider">
+                  Filtered Income
+                </span>
+                <span className="text-lg font-black text-emerald-600">
+                  ₹{totalIncome.toLocaleString('en-IN')}
+                </span>
+              </div>
+
+              {/* 3. Filtered Expense */}
+              <div className="p-3.5 rounded-2xl bg-rose-50/80 border border-rose-200/90 text-rose-900 shadow-xs">
+                <span className="text-[10px] font-bold text-rose-700 block mb-0.5 uppercase tracking-wider">
+                  Filtered Expense
+                </span>
+                <span className="text-lg font-black text-rose-600">
+                  ₹{totalExpense.toLocaleString('en-IN')}
+                </span>
+              </div>
+
+              {/* 4. Filtered Net Result */}
+              <div className="p-3.5 rounded-2xl bg-blue-50/80 border border-blue-200/90 text-blue-900 shadow-xs">
+                <span className="text-[10px] font-bold text-blue-700 block mb-0.5 uppercase tracking-wider">
+                  Filtered Net Result
+                </span>
+                <span className={`text-lg font-black ${filteredNetTotal >= 0 ? 'text-emerald-600' : 'text-rose-600'}`}>
+                  {filteredNetTotal >= 0 ? '+' : ''}₹{filteredNetTotal.toLocaleString('en-IN')}
+                </span>
+              </div>
+            </div>
           </div>
 
           {/* Budget Data Table */}
@@ -451,6 +526,46 @@ export default function DataView() {
               data={filteredFeedbacks}
               onMore={(customer) => setSelectedCustomer(customer)}
               onEdit={(row) => setEditingFeedback(row)}
+              onStatusChange={async (id, newStatus) => {
+                // Optimistic UI state update (Instant 0ms screen change)
+                setFeedbacks((prev) =>
+                  prev.map((f) => (f.id === id ? { ...f, status: newStatus } : f))
+                );
+
+                try {
+                  const res = await apiUpdateFeedback({ id, status: newStatus });
+                  if (res && res.success) {
+                    Swal.fire({
+                      icon: 'success',
+                      title: `Status set to ${newStatus}`,
+                      toast: true,
+                      position: 'top-end',
+                      showConfirmButton: false,
+                      timer: 1500,
+                    });
+                  } else {
+                    // Revert if API failed
+                    setFeedbacks((prev) =>
+                      prev.map((f) => (f.id === id ? { ...f, status: newStatus === 'Success' ? 'Pending' : 'Success' } : f))
+                    );
+                    Swal.fire({
+                      icon: 'error',
+                      title: 'Update Failed',
+                      text: (res && res.message) || 'Could not update status on Google Sheets.',
+                    });
+                  }
+                } catch (err) {
+                  // Revert if API failed
+                  setFeedbacks((prev) =>
+                    prev.map((f) => (f.id === id ? { ...f, status: newStatus === 'Success' ? 'Pending' : 'Success' } : f))
+                  );
+                  Swal.fire({
+                    icon: 'error',
+                    title: 'Update Error',
+                    text: err.message || 'Could not update status on Google Sheets.',
+                  });
+                }
+              }}
               onDelete={async (id) => {
                 await apiDeleteFeedback(id);
                 loadAllData();
@@ -465,34 +580,6 @@ export default function DataView() {
               onMore={(customer) => setSelectedCustomer(customer)}
               onPreviewDoc={(url, name) => setPreviewDoc({ url, name })}
               onEdit={(row) => setEditingCustomer(row)}
-              onStatusChange={async (id, newStatus) => {
-                // Optimistic UI state update (Instant 0ms screen change)
-                setCustomers((prev) =>
-                  prev.map((c) => (c.id === id ? { ...c, status: newStatus } : c))
-                );
-
-                const res = await apiUpdateCustomer({ id, status: newStatus });
-                if (res && res.success) {
-                  Swal.fire({
-                    icon: 'success',
-                    title: `Status set to ${newStatus}`,
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 1500,
-                  });
-                } else {
-                  // Revert if API failed
-                  setCustomers((prev) =>
-                    prev.map((c) => (c.id === id ? { ...c, status: newStatus === 'Success' ? 'Pending' : 'Success' } : c))
-                  );
-                  Swal.fire({
-                    icon: 'error',
-                    title: 'Update Failed',
-                    text: (res && res.message) || 'Could not update status on Google Sheets.',
-                  });
-                }
-              }}
               onDelete={async (id) => {
                 await apiDeleteCustomer(id);
                 loadAllData();

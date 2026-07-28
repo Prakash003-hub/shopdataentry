@@ -113,7 +113,7 @@ function getBudgetSheet() {
 }
 
 function getFeedbackSheet() {
-  return getOrCreateSheet("CustomerFeedback", ["ID", "Name", "Phone", "Service", "Description", "Date", "Created Time"]);
+  return getOrCreateSheet("CustomerFeedback", ["ID", "Name", "Phone", "Service", "Description", "Date", "Status", "Created Time"]);
 }
 
 function getCustomerSheet() {
@@ -229,9 +229,22 @@ function deleteBudget(data) {
   return { success: false, message: "Record not found" };
 }
 
+function ensureFeedbackStatusColumn(sheet) {
+  var colMap = getColumnMap(sheet);
+  if (!colMap["status"]) {
+    sheet.insertColumnBefore(7);
+    sheet.getRange(1, 7).setValue("Status").setFontWeight("bold").setBackground("#16A34A").setFontColor("#FFFFFF");
+    var lastRow = sheet.getLastRow();
+    if (lastRow > 1) {
+      sheet.getRange(2, 7, lastRow - 1, 1).setValue("Pending");
+    }
+  }
+}
+
 // ----------------- CUSTOMER FEEDBACK CONTROLLERS -----------------
 function addFeedback(data) {
   var sheet = getFeedbackSheet();
+  ensureFeedbackStatusColumn(sheet);
   var id = "FB_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
   var now = new Date().toISOString();
 
@@ -242,6 +255,7 @@ function addFeedback(data) {
     data.service || "",
     data.description || "",
     data.date || formatLocalDate(new Date()),
+    data.status || "Pending",
     now
   ]);
 
@@ -250,18 +264,37 @@ function addFeedback(data) {
 
 function getFeedbackList() {
   var sheet = getFeedbackSheet();
+  ensureFeedbackStatusColumn(sheet);
+
   var data = sheet.getDataRange().getValues();
   var results = [];
+  if (data.length <= 1) return { success: true, data: [] };
+
+  var colMap = getColumnMap(sheet);
+  var idCol = (colMap["id"] || 1) - 1;
+  var nameCol = (colMap["name"] || 2) - 1;
+  var phoneCol = (colMap["phone"] || 3) - 1;
+  var serviceCol = (colMap["service"] || 4) - 1;
+  var descCol = (colMap["description"] || 5) - 1;
+  var dateCol = (colMap["date"] || 6) - 1;
+  var statusCol = (colMap["status"] || 7) - 1;
+  var createdCol = (colMap["created time"] || 8) - 1;
 
   for (var i = 1; i < data.length; i++) {
+    var statusVal = String(data[i][statusCol] || "Pending").trim();
+    if (!statusVal || statusVal.includes("T") || statusVal.length > 20) {
+      statusVal = "Pending";
+    }
+
     results.push({
-      id: data[i][0],
-      name: data[i][1],
-      phone: String(data[i][2]),
-      service: data[i][3],
-      description: data[i][4],
-      date: formatLocalDate(data[i][5]),
-      createdTime: data[i][6]
+      id: data[i][idCol],
+      name: data[i][nameCol],
+      phone: String(data[i][phoneCol]),
+      service: data[i][serviceCol],
+      description: data[i][descCol],
+      date: formatLocalDate(data[i][dateCol]),
+      status: statusVal,
+      createdTime: data[i][createdCol] || new Date().toISOString()
     });
   }
 
@@ -270,16 +303,32 @@ function getFeedbackList() {
 
 function updateFeedback(data) {
   var sheet = getFeedbackSheet();
+  ensureFeedbackStatusColumn(sheet);
+
   var values = sheet.getDataRange().getValues();
+  var colMap = getColumnMap(sheet);
+
+  var idCol = (colMap["id"] || 1) - 1;
+  var nameColNum = colMap["name"] || 2;
+  var phoneColNum = colMap["phone"] || 3;
+  var serviceColNum = colMap["service"] || 4;
+  var descColNum = colMap["description"] || 5;
+  var dateColNum = colMap["date"] || 6;
+  var statusColNum = colMap["status"] || 7;
+
+  var targetId = String(data.id || "").trim();
 
   for (var i = 1; i < values.length; i++) {
-    if (values[i][0] == data.id) {
-      if (data.name) sheet.getRange(i + 1, 2).setValue(data.name);
-      if (data.phone) sheet.getRange(i + 1, 3).setValue(data.phone);
-      if (data.service) sheet.getRange(i + 1, 4).setValue(data.service);
-      if (data.description !== undefined) sheet.getRange(i + 1, 5).setValue(data.description);
-      if (data.date) sheet.getRange(i + 1, 6).setValue(data.date);
+    var rowId = String(values[i][idCol] || values[i][0] || "").trim();
+    if (rowId === targetId) {
+      if (data.name) sheet.getRange(i + 1, nameColNum).setValue(data.name);
+      if (data.phone) sheet.getRange(i + 1, phoneColNum).setValue(data.phone);
+      if (data.service) sheet.getRange(i + 1, serviceColNum).setValue(data.service);
+      if (data.description !== undefined) sheet.getRange(i + 1, descColNum).setValue(data.description);
+      if (data.date) sheet.getRange(i + 1, dateColNum).setValue(data.date);
+      if (data.status) sheet.getRange(i + 1, statusColNum).setValue(data.status);
 
+      SpreadsheetApp.flush();
       return { success: true, message: "Feedback updated" };
     }
   }
@@ -289,9 +338,10 @@ function updateFeedback(data) {
 function deleteFeedback(data) {
   var sheet = getFeedbackSheet();
   var values = sheet.getDataRange().getValues();
+  var targetId = String(data.id || "").trim();
 
   for (var i = 1; i < values.length; i++) {
-    if (values[i][0] == data.id) {
+    if (String(values[i][0]).trim() == targetId) {
       sheet.deleteRow(i + 1);
       return { success: true, message: "Feedback deleted" };
     }

@@ -4,6 +4,9 @@ import FeedbackTable from '../components/Tables/FeedbackTable';
 import CustomerTable from '../components/Tables/CustomerTable';
 import CustomerDrawer from '../components/Modals/CustomerDrawer';
 import DocumentPreviewModal from '../components/Modals/DocumentPreviewModal';
+import EditBudgetModal from '../components/Modals/EditBudgetModal';
+import EditFeedbackModal from '../components/Modals/EditFeedbackModal';
+import EditCustomerModal from '../components/Modals/EditCustomerModal';
 import DailyTrendChart from '../components/Charts/DailyTrendChart';
 import CategoryPieChart from '../components/Charts/CategoryPieChart';
 import { exportToCSV, printReport } from '../services/exportUtils';
@@ -39,6 +42,11 @@ export default function DataView() {
   const [feedbacks, setFeedbacks] = useState([]);
   const [customers, setCustomers] = useState([]);
   const [loading, setLoading] = useState(true);
+
+  // --- EDIT MODAL STATES ---
+  const [editingBudget, setEditingBudget] = useState(null);
+  const [editingFeedback, setEditingFeedback] = useState(null);
+  const [editingCustomer, setEditingCustomer] = useState(null);
 
   // --- FILTERS & SEARCH ---
   const [searchQuery, setSearchQuery] = useState('');
@@ -326,7 +334,7 @@ export default function DataView() {
           {/* Budget Data Table */}
           <BudgetTable
             data={paginatedBudgets}
-            onEdit={() => {}}
+            onEdit={(row) => setEditingBudget(row)}
             onDelete={async (id) => {
               await apiDeleteBudget(id);
               loadAllData();
@@ -442,6 +450,7 @@ export default function DataView() {
             <FeedbackTable
               data={filteredFeedbacks}
               onMore={(customer) => setSelectedCustomer(customer)}
+              onEdit={(row) => setEditingFeedback(row)}
               onDelete={async (id) => {
                 await apiDeleteFeedback(id);
                 loadAllData();
@@ -455,6 +464,19 @@ export default function DataView() {
               data={filteredCustomers}
               onMore={(customer) => setSelectedCustomer(customer)}
               onPreviewDoc={(url, name) => setPreviewDoc({ url, name })}
+              onEdit={(row) => setEditingCustomer(row)}
+              onStatusChange={async (id, newStatus) => {
+                await apiUpdateCustomer({ id, status: newStatus });
+                loadAllData();
+                Swal.fire({
+                  icon: 'success',
+                  title: `Status updated to ${newStatus}`,
+                  toast: true,
+                  position: 'top-end',
+                  showConfirmButton: false,
+                  timer: 1500,
+                });
+              }}
               onDelete={async (id) => {
                 await apiDeleteCustomer(id);
                 loadAllData();
@@ -479,6 +501,33 @@ export default function DataView() {
           docUrl={previewDoc.url}
           docName={previewDoc.name}
           onClose={() => setPreviewDoc(null)}
+        />
+      )}
+
+      {/* Edit Budget Modal */}
+      {editingBudget && (
+        <EditBudgetModal
+          item={editingBudget}
+          onClose={() => setEditingBudget(null)}
+          onUpdated={loadAllData}
+        />
+      )}
+
+      {/* Edit Feedback Modal */}
+      {editingFeedback && (
+        <EditFeedbackModal
+          item={editingFeedback}
+          onClose={() => setEditingFeedback(null)}
+          onUpdated={loadAllData}
+        />
+      )}
+
+      {/* Edit Customer Modal */}
+      {editingCustomer && (
+        <EditCustomerModal
+          item={editingCustomer}
+          onClose={() => setEditingCustomer(null)}
+          onUpdated={loadAllData}
         />
       )}
     </div>

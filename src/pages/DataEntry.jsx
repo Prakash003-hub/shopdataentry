@@ -49,6 +49,7 @@ export default function DataEntry() {
   const [cName, setCName] = useState('');
   const [cAadhaar, setCAadhaar] = useState('');
   const [cPhone, setCPhone] = useState('');
+  const [cStatus, setCStatus] = useState('Pending');
   const [cFiles, setCFiles] = useState([]);
   const [cSubmitting, setCSubmitting] = useState(false);
 
@@ -213,6 +214,7 @@ export default function DataEntry() {
       name: cName,
       aadhaar: cAadhaar,
       phone: cPhone,
+      status: cStatus,
       driveFileIds,
       driveUrls,
       fileNames,
@@ -234,6 +236,7 @@ export default function DataEntry() {
       setCName('');
       setCAadhaar('');
       setCPhone('');
+      setCStatus('Pending');
       setCFiles([]);
     }
   };
@@ -566,7 +569,7 @@ export default function DataEntry() {
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-xs font-bold text-slate-700 mb-1">
                     Aadhaar Number
@@ -592,6 +595,19 @@ export default function DataEntry() {
                     className="w-full glass-input px-4 py-3 rounded-2xl text-sm font-semibold text-slate-800"
                     required
                   />
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-slate-700 mb-1">
+                    Status
+                  </label>
+                  <select
+                    value={cStatus}
+                    onChange={(e) => setCStatus(e.target.value)}
+                    className="w-full glass-input px-4 py-3 rounded-2xl text-sm font-semibold text-slate-800"
+                  >
+                    <option value="Pending">Pending ⏳</option>
+                    <option value="Success">Success ✅</option>
+                  </select>
                 </div>
               </div>
 

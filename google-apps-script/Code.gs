@@ -117,7 +117,7 @@ function getFeedbackSheet() {
 }
 
 function getCustomerSheet() {
-  return getOrCreateSheet("CustomerData", ["ID", "Name", "Aadhaar", "Phone", "Drive File IDs", "Drive URLs", "File Names", "Created Time"]);
+  return getOrCreateSheet("CustomerData", ["ID", "Name", "Aadhaar", "Phone", "Drive File IDs", "Drive URLs", "File Names", "Status", "Created Time"]);
 }
 
 // ----------------- RECALCULATE RUNNING BALANCE -----------------
@@ -313,6 +313,7 @@ function addCustomer(data) {
     JSON.stringify(data.driveFileIds || []),
     JSON.stringify(data.driveUrls || []),
     JSON.stringify(data.fileNames || []),
+    data.status || "Pending",
     now
   ]);
 
@@ -332,6 +333,14 @@ function getCustomerList() {
     try { urls = JSON.parse(data[i][5]); } catch(e) { urls = data[i][5] ? [data[i][5]] : []; }
     try { names = JSON.parse(data[i][6]); } catch(e) { names = data[i][6] ? [data[i][6]] : []; }
 
+    var statusVal = data[i][7];
+    var createdVal = data[i][8];
+    // Backward compatibility if status column was created after createdTime
+    if (statusVal instanceof Date || (typeof statusVal === "string" && statusVal.includes("T"))) {
+      createdVal = statusVal;
+      statusVal = "Pending";
+    }
+
     results.push({
       id: data[i][0],
       name: data[i][1],
@@ -340,7 +349,8 @@ function getCustomerList() {
       driveFileIds: fileIds,
       driveUrls: urls,
       fileNames: names,
-      createdTime: data[i][7]
+      status: statusVal || "Pending",
+      createdTime: createdVal
     });
   }
 
@@ -354,11 +364,12 @@ function updateCustomer(data) {
   for (var i = 1; i < values.length; i++) {
     if (values[i][0] == data.id) {
       if (data.name) sheet.getRange(i + 1, 2).setValue(data.name);
-      if (data.aadhaar) sheet.getRange(i + 1, 3).setValue(data.aadhaar);
+      if (data.aadhaar !== undefined) sheet.getRange(i + 1, 3).setValue(data.aadhaar);
       if (data.phone) sheet.getRange(i + 1, 4).setValue(data.phone);
       if (data.driveFileIds) sheet.getRange(i + 1, 5).setValue(JSON.stringify(data.driveFileIds));
       if (data.driveUrls) sheet.getRange(i + 1, 6).setValue(JSON.stringify(data.driveUrls));
       if (data.fileNames) sheet.getRange(i + 1, 7).setValue(JSON.stringify(data.fileNames));
+      if (data.status) sheet.getRange(i + 1, 8).setValue(data.status);
 
       return { success: true, message: "Customer updated" };
     }

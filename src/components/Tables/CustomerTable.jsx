@@ -1,8 +1,8 @@
 import React from 'react';
-import { MessageSquare, PhoneCall, MoreHorizontal, FileText, Download, Edit2, Trash2, UserCheck } from 'lucide-react';
+import { MessageSquare, PhoneCall, MoreHorizontal, FileText, Download, Edit2, Trash2, UserCheck, CheckCircle2, Clock } from 'lucide-react';
 import Swal from 'sweetalert2';
 
-export default function CustomerTable({ data, onMore, onPreviewDoc, onEdit, onDelete }) {
+export default function CustomerTable({ data, onMore, onPreviewDoc, onEdit, onDelete, onStatusChange }) {
   const handleDelete = (id, name) => {
     Swal.fire({
       title: 'Delete Record?',
@@ -33,6 +33,13 @@ export default function CustomerTable({ data, onMore, onPreviewDoc, onEdit, onDe
     window.location.href = `tel:${phone}`;
   };
 
+  const handleToggleStatus = (row) => {
+    const nextStatus = row.status === 'Success' ? 'Pending' : 'Success';
+    if (onStatusChange) {
+      onStatusChange(row.id, nextStatus);
+    }
+  };
+
   if (!data || data.length === 0) {
     return (
       <div className="p-8 text-center bg-white/60 backdrop-blur-md rounded-3xl border border-slate-200/80">
@@ -51,6 +58,7 @@ export default function CustomerTable({ data, onMore, onPreviewDoc, onEdit, onDe
             <th className="py-3.5 px-4">Customer Name</th>
             <th className="py-3.5 px-4">Aadhaar Number</th>
             <th className="py-3.5 px-4">Phone Number</th>
+            <th className="py-3.5 px-4 text-center">Status</th>
             <th className="py-3.5 px-4 text-center">Documents</th>
             <th className="py-3.5 px-4 text-center">Quick Contact</th>
             <th className="py-3.5 px-4 text-center">Actions</th>
@@ -59,6 +67,8 @@ export default function CustomerTable({ data, onMore, onPreviewDoc, onEdit, onDe
         <tbody className="divide-y divide-slate-100 text-xs font-medium text-slate-800">
           {data.map((row) => {
             const hasDocs = row.driveUrls && row.driveUrls.length > 0;
+            const isSuccess = row.status === 'Success';
+
             return (
               <tr key={row.id} className="hover:bg-green-50/30 transition-colors">
                 <td className="py-3.5 px-4 whitespace-nowrap font-bold text-slate-900">
@@ -69,6 +79,31 @@ export default function CustomerTable({ data, onMore, onPreviewDoc, onEdit, onDe
                 </td>
                 <td className="py-3.5 px-4 whitespace-nowrap font-semibold text-slate-700">
                   {row.phone}
+                </td>
+                {/* Status Column with 1-Tap Toggle */}
+                <td className="py-3.5 px-4 whitespace-nowrap text-center">
+                  <button
+                    type="button"
+                    onClick={() => handleToggleStatus(row)}
+                    className={`inline-flex items-center gap-1 px-3 py-1 rounded-full text-[11px] font-bold border transition-all cursor-pointer shadow-xs active:scale-95 ${
+                      isSuccess
+                        ? 'bg-emerald-100 text-emerald-800 border-emerald-300 hover:bg-emerald-200'
+                        : 'bg-amber-100 text-amber-800 border-amber-300 hover:bg-amber-200'
+                    }`}
+                    title="Click to toggle status"
+                  >
+                    {isSuccess ? (
+                      <>
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+                        <span>Success</span>
+                      </>
+                    ) : (
+                      <>
+                        <Clock className="w-3.5 h-3.5 text-amber-600" />
+                        <span>Pending</span>
+                      </>
+                    )}
+                  </button>
                 </td>
                 <td className="py-3.5 px-4 whitespace-nowrap text-center">
                   {hasDocs ? (

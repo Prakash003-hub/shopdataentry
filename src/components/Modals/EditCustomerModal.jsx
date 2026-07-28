@@ -10,7 +10,6 @@ export default function EditCustomerModal({ item, onClose, onUpdated }) {
   const [name, setName] = useState(item.name || '');
   const [aadhaar, setAadhaar] = useState(item.aadhaar || '');
   const [phone, setPhone] = useState(item.phone || '');
-  const [status, setStatus] = useState(item.status || 'Pending');
   const [newFiles, setNewFiles] = useState([]);
   const [submitting, setSubmitting] = useState(false);
 
@@ -106,7 +105,7 @@ export default function EditCustomerModal({ item, onClose, onUpdated }) {
             />
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="block text-xs font-bold text-slate-700 mb-1">Aadhaar Number</label>
               <input
@@ -126,18 +125,6 @@ export default function EditCustomerModal({ item, onClose, onUpdated }) {
                 className="w-full glass-input px-4 py-3 rounded-2xl text-sm font-semibold text-slate-800"
                 required
               />
-            </div>
-
-            <div>
-              <label className="block text-xs font-bold text-slate-700 mb-1">Status</label>
-              <select
-                value={status}
-                onChange={(e) => setStatus(e.target.value)}
-                className="w-full glass-input px-4 py-3 rounded-2xl text-sm font-semibold text-slate-800"
-              >
-                <option value="Pending">Pending ⏳</option>
-                <option value="Success">Success ✅</option>
-              </select>
             </div>
           </div>
 

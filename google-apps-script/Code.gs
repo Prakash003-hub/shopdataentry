@@ -299,9 +299,34 @@ function deleteFeedback(data) {
   return { success: false, message: "Feedback not found" };
 }
 
+function getColumnMap(sheet) {
+  var lastCol = sheet.getLastColumn();
+  if (lastCol === 0) return {};
+  var headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
+  var map = {};
+  for (var i = 0; i < headers.length; i++) {
+    map[String(headers[i]).trim().toLowerCase()] = i + 1; // 1-indexed column number
+  }
+  return map;
+}
+
+function ensureStatusColumn(sheet) {
+  var colMap = getColumnMap(sheet);
+  if (!colMap["status"]) {
+    // If Status column does not exist in existing sheet, insert it at column 8
+    sheet.insertColumnBefore(8);
+    sheet.getRange(1, 8).setValue("Status").setFontWeight("bold").setBackground("#16A34A").setFontColor("#FFFFFF");
+    var lastRow = sheet.getLastRow();
+    if (lastRow > 1) {
+      sheet.getRange(2, 8, lastRow - 1, 1).setValue("Pending");
+    }
+  }
+}
+
 // ----------------- CUSTOMER DATA CONTROLLERS -----------------
 function addCustomer(data) {
   var sheet = getCustomerSheet();
+  ensureStatusColumn(sheet);
   var id = "CST_" + Date.now() + "_" + Math.floor(Math.random() * 1000);
   var now = new Date().toISOString();
 
@@ -322,35 +347,46 @@ function addCustomer(data) {
 
 function getCustomerList() {
   var sheet = getCustomerSheet();
+  ensureStatusColumn(sheet);
+
   var data = sheet.getDataRange().getValues();
   var results = [];
+  if (data.length <= 1) return { success: true, data: [] };
+
+  var colMap = getColumnMap(sheet);
+  var idCol = (colMap["id"] || 1) - 1;
+  var nameCol = (colMap["name"] || 2) - 1;
+  var aadhaarCol = (colMap["aadhaar"] || 3) - 1;
+  var phoneCol = (colMap["phone"] || 4) - 1;
+  var fileIdsCol = (colMap["drive file ids"] || 5) - 1;
+  var urlsCol = (colMap["drive urls"] || 6) - 1;
+  var namesCol = (colMap["file names"] || 7) - 1;
+  var statusCol = (colMap["status"] || 8) - 1;
+  var createdCol = (colMap["created time"] || 9) - 1;
 
   for (var i = 1; i < data.length; i++) {
     var fileIds = [];
     var urls = [];
     var names = [];
-    try { fileIds = JSON.parse(data[i][4]); } catch(e) { fileIds = data[i][4] ? [data[i][4]] : []; }
-    try { urls = JSON.parse(data[i][5]); } catch(e) { urls = data[i][5] ? [data[i][5]] : []; }
-    try { names = JSON.parse(data[i][6]); } catch(e) { names = data[i][6] ? [data[i][6]] : []; }
+    try { fileIds = JSON.parse(data[i][fileIdsCol]); } catch(e) { fileIds = data[i][fileIdsCol] ? [data[i][fileIdsCol]] : []; }
+    try { urls = JSON.parse(data[i][urlsCol]); } catch(e) { urls = data[i][urlsCol] ? [data[i][urlsCol]] : []; }
+    try { names = JSON.parse(data[i][namesCol]); } catch(e) { names = data[i][namesCol] ? [data[i][namesCol]] : []; }
 
-    var statusVal = data[i][7];
-    var createdVal = data[i][8];
-    // Backward compatibility if status column was created after createdTime
-    if (statusVal instanceof Date || (typeof statusVal === "string" && statusVal.includes("T"))) {
-      createdVal = statusVal;
+    var statusVal = String(data[i][statusCol] || "Pending").trim();
+    if (!statusVal || statusVal.includes("T") || statusVal.length > 20) {
       statusVal = "Pending";
     }
 
     results.push({
-      id: data[i][0],
-      name: data[i][1],
-      aadhaar: String(data[i][2]),
-      phone: String(data[i][3]),
+      id: data[i][idCol],
+      name: data[i][nameCol],
+      aadhaar: String(data[i][aadhaarCol]),
+      phone: String(data[i][phoneCol]),
       driveFileIds: fileIds,
       driveUrls: urls,
       fileNames: names,
-      status: statusVal || "Pending",
-      createdTime: createdVal
+      status: statusVal,
+      createdTime: data[i][createdCol] || new Date().toISOString()
     });
   }
 
@@ -359,17 +395,29 @@ function getCustomerList() {
 
 function updateCustomer(data) {
   var sheet = getCustomerSheet();
+  ensureStatusColumn(sheet);
+
   var values = sheet.getDataRange().getValues();
+  var colMap = getColumnMap(sheet);
+
+  var idCol = (colMap["id"] || 1) - 1;
+  var nameColNum = colMap["name"] || 2;
+  var aadhaarColNum = colMap["aadhaar"] || 3;
+  var phoneColNum = colMap["phone"] || 4;
+  var fileIdsColNum = colMap["drive file ids"] || 5;
+  var urlsColNum = colMap["drive urls"] || 6;
+  var namesColNum = colMap["file names"] || 7;
+  var statusColNum = colMap["status"] || 8;
 
   for (var i = 1; i < values.length; i++) {
-    if (values[i][0] == data.id) {
-      if (data.name) sheet.getRange(i + 1, 2).setValue(data.name);
-      if (data.aadhaar !== undefined) sheet.getRange(i + 1, 3).setValue(data.aadhaar);
-      if (data.phone) sheet.getRange(i + 1, 4).setValue(data.phone);
-      if (data.driveFileIds) sheet.getRange(i + 1, 5).setValue(JSON.stringify(data.driveFileIds));
-      if (data.driveUrls) sheet.getRange(i + 1, 6).setValue(JSON.stringify(data.driveUrls));
-      if (data.fileNames) sheet.getRange(i + 1, 7).setValue(JSON.stringify(data.fileNames));
-      if (data.status) sheet.getRange(i + 1, 8).setValue(data.status);
+    if (values[i][idCol] == data.id) {
+      if (data.name) sheet.getRange(i + 1, nameColNum).setValue(data.name);
+      if (data.aadhaar !== undefined) sheet.getRange(i + 1, aadhaarColNum).setValue(data.aadhaar);
+      if (data.phone) sheet.getRange(i + 1, phoneColNum).setValue(data.phone);
+      if (data.driveFileIds) sheet.getRange(i + 1, fileIdsColNum).setValue(JSON.stringify(data.driveFileIds));
+      if (data.driveUrls) sheet.getRange(i + 1, urlsColNum).setValue(JSON.stringify(data.driveUrls));
+      if (data.fileNames) sheet.getRange(i + 1, namesColNum).setValue(JSON.stringify(data.fileNames));
+      if (data.status) sheet.getRange(i + 1, statusColNum).setValue(data.status);
 
       return { success: true, message: "Customer updated" };
     }

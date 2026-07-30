@@ -14,7 +14,8 @@ import {
   ShieldCheck,
   Building2,
   Landmark,
-  Layers
+  Layers,
+  GraduationCap
 } from 'lucide-react';
 import FileUpload from '../components/FileUpload';
 import Swal from 'sweetalert2';
@@ -578,6 +579,172 @@ const DEFAULT_SERVICES = [
     ],
   },
 
+  // ================= COMPETITIVE & ENTRANCE EXAM SERVICES =================
+  {
+    id: 'tnpsc_exam',
+    group: 'Exam',
+    name: 'TNPSC Recruitment Examinations',
+    category: 'Employment',
+    url: 'https://www.tnpsc.gov.in/',
+    iconColor: 'from-amber-600 to-orange-700',
+    description: 'Tamil Nadu Public Service Commission Vacancy Applications & OTR.',
+    subServices: [
+      {
+        id: 'tnpsc_group4',
+        name: 'TNPSC Group 4 / VAO Application (குரூப் 4 தேர்வு)',
+        description: 'VAO, Junior Assistant, Typist & Bill Collector examination portal.',
+        govtFee: '₹100 (Free for SC/ST)',
+        serviceCharge: '₹60',
+        processingTime: 'Instant',
+        requiredDocs: [
+          'Applicant Aadhaar Card',
+          'Passport Size Photo (White Background with Name & Date printed)',
+          'Signature Scan (Black ink)',
+          '10th / 12th / Diploma / Degree Marksheets',
+          'Community Certificate Copy',
+          'TNPSC One Time Registration (OTR) Login ID & Password',
+        ],
+        steps: [
+          'Verify One Time Registration (OTR) validity (5 years).',
+          'Log in to TNPSC application portal.',
+          'Select Group 4 Notification & fill educational marks.',
+          'Upload photo, signature, and pay ₹100 exam fee.',
+          'Print application confirmation for customer.',
+        ],
+      },
+      {
+        id: 'tnpsc_group2',
+        name: 'TNPSC Group 2 & 2A (குரூப் 2 தேர்வு)',
+        description: 'Sub Registrar, Municipal Commissioner, Deputy Commercial Tax Officer.',
+        govtFee: '₹100',
+        serviceCharge: '₹60',
+        processingTime: 'Instant',
+        requiredDocs: [
+          'Degree Provisional / Convocation Certificate',
+          '10th & 12th Marksheets (Medium of Instruction Tamil PSTM Proof)',
+          'Community Certificate',
+          'Aadhaar Card & Photo/Signature',
+        ],
+        steps: [
+          'Select Group 2 / 2A notification link.',
+          'Verify degree details and PSTM reservation eligibility.',
+          'Submit application and issue acknowledgment slip.',
+        ],
+      },
+      {
+        id: 'tnpsc_otr',
+        name: 'TNPSC One Time Registration (OTR Renewal / New)',
+        description: 'New OTR creation or 5-year OTR renewal on TNPSC portal.',
+        govtFee: '₹150',
+        serviceCharge: '₹50',
+        processingTime: 'Instant',
+        requiredDocs: [
+          '10th SSLC Register Number & Certificate',
+          'Aadhaar Number (Aadhaar OTP verification required)',
+          'Passport Size Photo & Signature Scan',
+          'Active Mobile Number & Email ID',
+        ],
+        steps: [
+          'Create OTR account using 10th SSLC roll number.',
+          'Verify Aadhaar e-KYC with mobile OTP.',
+          'Pay ₹150 OTR fee (valid for 5 years).',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'ssc_exam',
+    group: 'Exam',
+    name: 'SSC Exam Portal (Staff Selection Commission)',
+    category: 'Employment',
+    url: 'https://ssc.gov.in/',
+    iconColor: 'from-blue-600 to-indigo-700',
+    description: 'Central Government Staff Selection Commission CGL, CHSL, MTS & GD Constable.',
+    subServices: [
+      {
+        id: 'ssc_cgl_chsl',
+        name: 'SSC CGL / CHSL / MTS Exam Application',
+        description: 'Combined Graduate Level & Higher Secondary Level Central Govt recruitment.',
+        govtFee: '₹100 (Free for Women/SC/ST)',
+        serviceCharge: '₹50',
+        processingTime: 'Instant',
+        requiredDocs: [
+          'Applicant Aadhaar Card',
+          'Live Webcam Photo Capture (as per new SSC portal rules)',
+          'Signature Scan',
+          '10th / 12th / Degree Marksheet',
+        ],
+        steps: [
+          'Log in to new SSC portal (ssc.gov.in).',
+          'Capture live webcam photo of candidate.',
+          'Fill preferred exam centers and qualifications.',
+          'Pay ₹100 fee online and print application form.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'tnusrb_exam',
+    group: 'Exam',
+    name: 'TN Police Recruitment (TNUSRB)',
+    category: 'Employment',
+    url: 'https://tnusrb.tn.gov.in/',
+    iconColor: 'from-red-600 to-rose-700',
+    description: 'Tamil Nadu Uniformed Services Recruitment Board Police Constable & SI.',
+    subServices: [
+      {
+        id: 'tnusrb_pc_si',
+        name: 'Police Constable / Sub-Inspector Application (காவலர் தேர்வு)',
+        description: 'Grade II Police Constable, Jail Warder, Firemen & Sub-Inspector recruitment.',
+        govtFee: '₹250',
+        serviceCharge: '₹70',
+        processingTime: 'Instant',
+        requiredDocs: [
+          '10th SSLC Marksheet (Passed Tamil Subject)',
+          'Community Certificate',
+          'Applicant Aadhaar Card',
+          'Passport Photo & Signature Scan',
+          'NCC / NSS / Sports Certificate (if claiming extra marks)',
+        ],
+        steps: [
+          'Register candidate on TNUSRB portal.',
+          'Upload 10th mark list and community cert.',
+          'Pay ₹250 examination fee.',
+        ],
+      },
+    ],
+  },
+  {
+    id: 'trb_exam',
+    group: 'Exam',
+    name: 'TRB Teacher Recruitment Board (TNTET / PG TRB)',
+    category: 'Employment',
+    url: 'https://trb.tn.gov.in/',
+    iconColor: 'from-purple-600 to-indigo-800',
+    description: 'Teacher Eligibility Test (TET) and Assistant Professor recruitment.',
+    subServices: [
+      {
+        id: 'trb_tet',
+        name: 'TNTET Teacher Eligibility Test (ஆசிரியர் தகுதித் தேர்வு)',
+        description: 'Paper 1 & Paper 2 Teacher Eligibility Test application.',
+        govtFee: '₹500 (₹250 for SC/ST)',
+        serviceCharge: '₹70',
+        processingTime: 'Instant',
+        requiredDocs: [
+          'D.T.Ed / B.Ed Marksheets & Degree Certificates',
+          '10th & 12th Marksheets',
+          'Community Certificate',
+          'Aadhaar Card & Photo/Signature',
+        ],
+        steps: [
+          'Select TNTET Paper 1 or Paper 2.',
+          'Fill B.Ed/D.T.Ed qualification marks.',
+          'Pay examination fee and print receipt.',
+        ],
+      },
+    ],
+  },
+
   // ================= PRIVATE & UTILITY SERVICES =================
   {
     id: 'tneb',
@@ -672,8 +839,8 @@ const DEFAULT_SERVICES = [
   },
 ];
 
-const MAIN_GROUPS = ['All', 'State', 'Central', 'Private'];
-const CATEGORIES = ['All', 'Certificates', 'Identity', 'Land & Revenue', 'Welfare', 'Utilities', 'Employment'];
+const MAIN_GROUPS = ['All', 'State', 'Central', 'Exam', 'Private'];
+const CATEGORIES = ['All', 'Certificates', 'Identity', 'Land & Revenue', 'Welfare', 'Utilities', 'Employment', 'Exam'];
 
 export default function ServiceList() {
   const [services, setServices] = useState([]);
@@ -919,29 +1086,37 @@ export default function ServiceList() {
   // Separate services into governance tier groups
   const stateServices = filteredServices.filter((s) => s.group === 'State');
   const centralServices = filteredServices.filter((s) => s.group === 'Central');
+  const examServices = filteredServices.filter((s) => s.group === 'Exam');
   const privateServices = filteredServices.filter((s) => s.group === 'Private');
 
   const renderCard = (srv) => {
     const isState = srv.group === 'State';
     const isCentral = srv.group === 'Central';
+    const isExam = srv.group === 'Exam';
     const isSelected = selectedService?.id === srv.id;
 
     const cardHoverBorder = isState
       ? 'hover:border-emerald-500/80'
       : isCentral
       ? 'hover:border-blue-500/80'
+      : isExam
+      ? 'hover:border-amber-500/80'
       : 'hover:border-purple-500/80';
 
     const groupBadgeStyle = isState
       ? 'bg-emerald-50/90 text-emerald-800 border-emerald-200'
       : isCentral
       ? 'bg-blue-50/90 text-blue-800 border-blue-200'
+      : isExam
+      ? 'bg-amber-50/90 text-amber-800 border-amber-200'
       : 'bg-purple-50/90 text-purple-800 border-purple-200';
 
     const portalBtnStyle = isState
       ? 'bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-700 hover:to-teal-700 shadow-emerald-600/30'
       : isCentral
       ? 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 shadow-blue-600/30'
+      : isExam
+      ? 'bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 shadow-amber-600/30'
       : 'bg-gradient-to-r from-purple-600 to-fuchsia-600 hover:from-purple-700 hover:to-fuchsia-700 shadow-purple-600/30';
 
     // ROW VIEW
@@ -975,7 +1150,7 @@ export default function ServiceList() {
                 <span
                   className={`inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg text-[10px] font-extrabold uppercase border ${groupBadgeStyle}`}
                 >
-                  {isState ? '🏛️ State Govt' : isCentral ? '🇮🇳 Central Govt' : '⚡ Private'}
+                  {isState ? '🏛️ State Govt' : isCentral ? '🇮🇳 Central Govt' : isExam ? '🎓 Exam Portal' : '⚡ Private'}
                 </span>
 
                 <span className="text-[10px] font-extrabold text-slate-500 px-2 py-0.5 rounded-md bg-slate-100/90 border border-slate-200/60">
@@ -1069,7 +1244,7 @@ export default function ServiceList() {
             <span
               className={`inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-[10px] font-extrabold uppercase border ${groupBadgeStyle}`}
             >
-              {isState ? '🏛️ State Govt' : isCentral ? '🇮🇳 Central Govt' : '⚡ Private'}
+              {isState ? '🏛️ State Govt' : isCentral ? '🇮🇳 Central Govt' : isExam ? '🎓 Exam Portal' : '⚡ Private'}
             </span>
 
             <span className="text-[10px] font-extrabold text-slate-500 px-2 py-0.5 rounded-md bg-slate-100/90 border border-slate-200/60">
@@ -1189,11 +1364,11 @@ export default function ServiceList() {
 
   return (
     <div className="space-y-6 pb-20 md:pb-6 ambient-bg p-4 sm:p-6 rounded-3xl border border-slate-200/60 shadow-xs">
-      {/* Main Governance Group Tabs (State, Central, Private) */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-white/80 backdrop-blur-md p-1.5 rounded-2xl border border-slate-200 shadow-sm">
+      {/* Main Governance Group Tabs (State, Central, Exam, Private) */}
+      <div className="grid grid-cols-2 sm:grid-cols-5 gap-2 bg-white/80 backdrop-blur-md p-1.5 rounded-2xl border border-slate-200 shadow-sm">
         <button
           onClick={() => setSelectedGroup('All')}
-          className={`flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-extrabold transition-all duration-200 ${
+          className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-extrabold transition-all duration-200 ${
             selectedGroup === 'All'
               ? 'bg-slate-900 text-white shadow-md scale-102'
               : 'text-slate-700 hover:bg-slate-100'
@@ -1205,31 +1380,43 @@ export default function ServiceList() {
 
         <button
           onClick={() => setSelectedGroup('State')}
-          className={`flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-extrabold transition-all duration-200 ${
+          className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-extrabold transition-all duration-200 ${
             selectedGroup === 'State'
               ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white shadow-md shadow-emerald-600/30 scale-102'
               : 'text-slate-700 hover:bg-emerald-50/60'
           }`}
         >
           <Landmark className="w-4 h-4 text-amber-300" />
-          <span>State Govt (மாநில)</span>
+          <span>State Govt</span>
         </button>
 
         <button
           onClick={() => setSelectedGroup('Central')}
-          className={`flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-extrabold transition-all duration-200 ${
+          className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-extrabold transition-all duration-200 ${
             selectedGroup === 'Central'
               ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-md shadow-blue-600/30 scale-102'
               : 'text-slate-700 hover:bg-blue-50/60'
           }`}
         >
           <Building2 className="w-4 h-4 text-cyan-300" />
-          <span>Central Govt (மத்திய)</span>
+          <span>Central Govt</span>
+        </button>
+
+        <button
+          onClick={() => setSelectedGroup('Exam')}
+          className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-extrabold transition-all duration-200 ${
+            selectedGroup === 'Exam'
+              ? 'bg-gradient-to-r from-amber-600 to-orange-600 text-white shadow-md shadow-amber-600/30 scale-102'
+              : 'text-slate-700 hover:bg-amber-50/60'
+          }`}
+        >
+          <GraduationCap className="w-4 h-4 text-yellow-300" />
+          <span>Exams (தேர்வு)</span>
         </button>
 
         <button
           onClick={() => setSelectedGroup('Private')}
-          className={`flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs sm:text-sm font-extrabold transition-all duration-200 ${
+          className={`flex items-center justify-center gap-2 py-2.5 px-3 rounded-xl text-xs sm:text-sm font-extrabold transition-all duration-200 ${
             selectedGroup === 'Private'
               ? 'bg-gradient-to-r from-purple-600 to-fuchsia-600 text-white shadow-md shadow-purple-600/30 scale-102'
               : 'text-slate-700 hover:bg-purple-50/60'
@@ -1249,7 +1436,7 @@ export default function ServiceList() {
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
-            placeholder="Search main service, sub-service (e.g. Income, Aadhaar, Ration, Patta), or document..."
+            placeholder="Search main service, sub-service (e.g. TNPSC, Income, Aadhaar, Ration, Exam), or document..."
             className="w-full pl-11 pr-4 py-3 bg-white/90 backdrop-blur-md border border-slate-200/90 rounded-2xl text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-emerald-500/30 focus:border-emerald-500 shadow-xs transition-all"
           />
           {searchQuery && (
@@ -1324,6 +1511,13 @@ export default function ServiceList() {
       )}
 
       {renderSection(
+        '🎓 Competitive & Entrance Exams (போட்டித் தேர்வுகள்)',
+        GraduationCap,
+        'bg-amber-50 text-amber-800 border-amber-200',
+        examServices
+      )}
+
+      {renderSection(
         '⚡ Private & Utility Services (தனியார் மற்றும் இதர சேவைகள்)',
         Globe,
         'bg-purple-50 text-purple-800 border-purple-200',
@@ -1335,7 +1529,7 @@ export default function ServiceList() {
           <Globe className="w-12 h-12 text-slate-300 mx-auto mb-3" />
           <h3 className="text-base font-bold text-slate-800">No Services Found</h3>
           <p className="text-xs text-slate-500 mt-1">
-            Try switching governance group (State/Central/Private) or clearing search filter.
+            Try switching governance group (State/Central/Exam/Private) or clearing search filter.
           </p>
         </div>
       )}
@@ -1350,7 +1544,7 @@ export default function ServiceList() {
             Need to Add a New Custom Service Shortcut?
           </h3>
           <p className="text-xs text-slate-300 mt-1 max-w-xl leading-relaxed">
-            Create your own shop service shortcuts (State, Central, or Private). Add custom portal links, required document lists, and fees.
+            Create your own shop service shortcuts (State, Central, Exam, or Private). Add custom portal links, required document lists, and fees.
           </p>
         </div>
 
@@ -1380,7 +1574,7 @@ export default function ServiceList() {
 
               <div className="flex items-center gap-2 text-xs font-semibold text-green-400 mb-1">
                 <ShieldCheck className="w-4 h-4" />
-                <span>{selectedService.group} Government Portal • {selectedService.category}</span>
+                <span>{selectedService.group} Portal • {selectedService.category}</span>
               </div>
 
               <h2 className="text-xl font-extrabold text-white pr-8">
@@ -1602,6 +1796,7 @@ export default function ServiceList() {
                   >
                     <option value="State">State Govt (மாநில)</option>
                     <option value="Central">Central Govt (மத்திய)</option>
+                    <option value="Exam">Competitive Exams (தேர்வுகள்)</option>
                     <option value="Private">Private & Utilities</option>
                   </select>
                 </div>
@@ -1631,7 +1826,7 @@ export default function ServiceList() {
                 <input
                   type="text"
                   required
-                  placeholder="e.g. TN Housing Board / EPFO PF Portal"
+                  placeholder="e.g. TNPSC Portal / TRB Exam / EPFO"
                   value={customForm.name}
                   onChange={(e) => setCustomForm({ ...customForm, name: e.target.value })}
                   className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-xs sm:text-sm font-medium focus:ring-2 focus:ring-green-500/30 focus:border-green-500 outline-none"
@@ -1665,7 +1860,7 @@ export default function ServiceList() {
                     <input
                       type="text"
                       required
-                      placeholder="e.g. PF Claim Withdrawal / Flat Scheme Application"
+                      placeholder="e.g. Group 4 / VAO Application / TET Exam"
                       value={customForm.subName}
                       onChange={(e) => setCustomForm({ ...customForm, subName: e.target.value })}
                       className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-xs sm:text-sm font-medium focus:ring-2 focus:ring-green-500/30 focus:border-green-500 outline-none"
@@ -1679,7 +1874,7 @@ export default function ServiceList() {
                       </label>
                       <input
                         type="text"
-                        placeholder="e.g. ₹60 or Free"
+                        placeholder="e.g. ₹100 or Free"
                         value={customForm.govtFee}
                         onChange={(e) => setCustomForm({ ...customForm, govtFee: e.target.value })}
                         className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-xs sm:text-sm font-medium focus:ring-2 focus:ring-green-500/30 focus:border-green-500 outline-none"
@@ -1692,7 +1887,7 @@ export default function ServiceList() {
                       </label>
                       <input
                         type="text"
-                        placeholder="e.g. ₹50"
+                        placeholder="e.g. ₹60"
                         value={customForm.serviceCharge}
                         onChange={(e) => setCustomForm({ ...customForm, serviceCharge: e.target.value })}
                         className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-xs sm:text-sm font-medium focus:ring-2 focus:ring-green-500/30 focus:border-green-500 outline-none"
@@ -1706,7 +1901,7 @@ export default function ServiceList() {
                     </label>
                     <textarea
                       rows={3}
-                      placeholder="UAN Number&#10;Aadhaar Card&#10;Bank Cancelled Cheque"
+                      placeholder="10th Marksheet&#10;Community Certificate&#10;Passport Photo & Signature"
                       value={customForm.requiredDocsStr}
                       onChange={(e) => setCustomForm({ ...customForm, requiredDocsStr: e.target.value })}
                       className="w-full px-3.5 py-2.5 border border-slate-200 rounded-xl text-xs sm:text-sm font-medium focus:ring-2 focus:ring-green-500/30 focus:border-green-500 outline-none"

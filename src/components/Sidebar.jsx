@@ -1,9 +1,15 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { PlusCircle, BarChart3, LayoutDashboard, Database, Smartphone } from 'lucide-react';
+import { PlusCircle, BarChart3, LayoutDashboard, Database, Globe } from 'lucide-react';
 
 export default function Sidebar() {
   const navItems = [
+    {
+      name: 'Service List',
+      path: '/services',
+      icon: Globe,
+      badge: 'Shortcuts',
+    },
     {
       name: 'Data Entry',
       path: '/data-entry',

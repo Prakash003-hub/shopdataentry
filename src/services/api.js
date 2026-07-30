@@ -200,6 +200,42 @@ export const apiDeleteCustomer = async (id) => {
   }
 };
 
+// ----------------- CUSTOM SERVICES APIS (GOOGLE SHEETS DIRECT) -----------------
+export const apiAddService = async (record) => {
+  const id = record.id || `custom_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+  const payload = {
+    ...record,
+    id,
+  };
+
+  try {
+    return await callGasApi('services_add', payload);
+  } catch (error) {
+    return { success: false, message: 'Failed to save service shortcut to Google Sheets.' };
+  }
+};
+
+export const apiGetServicesList = async () => {
+  try {
+    const res = await callGasApi('services_list');
+    if (res.success && Array.isArray(res.data)) {
+      return res.data;
+    }
+    return [];
+  } catch (error) {
+    console.error('Failed to fetch custom services from Google Sheets:', error);
+    return [];
+  }
+};
+
+export const apiDeleteService = async (id) => {
+  try {
+    return await callGasApi('services_delete', { id });
+  } catch (error) {
+    return { success: false, message: 'Failed to delete service shortcut from Google Sheets.' };
+  }
+};
+
 // ----------------- GOOGLE DRIVE FILE UPLOAD (ONLINE DIRECT) -----------------
 export const apiUploadFiles = async (files) => {
   try {

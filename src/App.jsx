@@ -5,8 +5,8 @@ import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import DataEntry from './pages/DataEntry';
 import DataView from './pages/DataView';
+import ServiceList from './pages/ServiceList';
 import Navbar from './components/Navbar';
-import Sidebar from './components/Sidebar';
 import BottomNav from './components/BottomNav';
 import PWAInstallPrompt from './components/PWAInstallPrompt';
 import OfflineSyncBanner from './components/OfflineSyncBanner';
@@ -32,9 +32,8 @@ function ProtectedLayout({ children, pwaPrompt, isInstalled, onInstall }) {
       <Navbar pwaPrompt={pwaPrompt} isInstalled={isInstalled} onInstall={onInstall} />
       <OfflineSyncBanner />
 
-      <div className="flex flex-1 max-w-7xl w-full mx-auto">
-        <Sidebar />
-        <main className="flex-1 p-4 md:p-6 overflow-y-auto">
+      <div className="flex-1 max-w-7xl w-full mx-auto p-4 md:p-6">
+        <main className="flex-1 overflow-y-auto">
           {children}
         </main>
       </div>
@@ -89,6 +88,18 @@ export default function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route
+          path="/services"
+          element={
+            <ProtectedLayout
+              pwaPrompt={deferredPrompt}
+              isInstalled={isInstalled}
+              onInstall={handleInstallClick}
+            >
+              <ServiceList />
+            </ProtectedLayout>
+          }
+        />
+        <Route
           path="/dashboard"
           element={
             <ProtectedLayout
@@ -124,7 +135,7 @@ export default function App() {
             </ProtectedLayout>
           }
         />
-        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+        <Route path="*" element={<Navigate to="/services" replace />} />
       </Routes>
     </AuthProvider>
   );

@@ -1,9 +1,15 @@
 import React from 'react';
 import { NavLink } from 'react-router-dom';
-import { PlusCircle, BarChart3, LayoutDashboard } from 'lucide-react';
+import { PlusCircle, BarChart3, LayoutDashboard, Globe } from 'lucide-react';
 
 export default function BottomNav() {
   const items = [
+    {
+      name: 'Services',
+      path: '/services',
+      icon: Globe,
+      label: 'Services',
+    },
     {
       name: 'Data Entry',
       path: '/data-entry',

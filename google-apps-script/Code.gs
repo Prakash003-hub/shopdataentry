@@ -68,6 +68,14 @@ function handleRequest(e) {
       case "upload":
         return jsonResponse(uploadFiles(contents));
 
+      // Custom Services APIs (Saved to Google Sheet)
+      case "services_add":
+        return jsonResponse(addService(contents));
+      case "services_list":
+        return jsonResponse(getServicesList());
+      case "services_delete":
+        return jsonResponse(deleteService(contents));
+
       // Dashboard Stats API
       case "dashboard":
         return jsonResponse(getDashboardStats());
@@ -490,6 +498,72 @@ function deleteCustomer(data) {
     }
   }
   return { success: false, message: "Customer record not found" };
+}
+
+// ----------------- CUSTOM SERVICES CONTROLLERS (GOOGLE SHEETS) -----------------
+function getServicesSheet() {
+  return getOrCreateSheet("CustomServices", ["ID", "Group", "Name", "Category", "URL", "Icon Color", "Description", "SubServices JSON", "Created Time"]);
+}
+
+function addService(data) {
+  var sheet = getServicesSheet();
+  var id = data.id || ("custom_" + Date.now() + "_" + Math.floor(Math.random() * 1000));
+  var now = new Date().toISOString();
+
+  sheet.appendRow([
+    id,
+    data.group || "State",
+    data.name || "",
+    data.category || "Certificates",
+    data.url || "",
+    data.iconColor || "from-purple-600 to-pink-600",
+    data.description || "",
+    JSON.stringify(data.subServices || []),
+    now
+  ]);
+
+  return { success: true, message: "Custom service saved to Google Sheet", id: id };
+}
+
+function getServicesList() {
+  var sheet = getServicesSheet();
+  var data = sheet.getDataRange().getValues();
+  var results = [];
+  if (data.length <= 1) return { success: true, data: [] };
+
+  for (var i = 1; i < data.length; i++) {
+    var subServices = [];
+    try { subServices = JSON.parse(data[i][7]); } catch(e) { subServices = []; }
+
+    results.push({
+      id: data[i][0],
+      group: data[i][1],
+      name: data[i][2],
+      category: data[i][3],
+      url: data[i][4],
+      iconColor: data[i][5],
+      description: data[i][6],
+      isCustom: true,
+      subServices: subServices,
+      createdTime: data[i][8] || new Date().toISOString()
+    });
+  }
+
+  return { success: true, data: results };
+}
+
+function deleteService(data) {
+  var sheet = getServicesSheet();
+  var values = sheet.getDataRange().getValues();
+  var targetId = String(data.id || "").trim();
+
+  for (var i = 1; i < values.length; i++) {
+    if (String(values[i][0]).trim() == targetId) {
+      sheet.deleteRow(i + 1);
+      return { success: true, message: "Service deleted from Google Sheet" };
+    }
+  }
+  return { success: false, message: "Service not found" };
 }
 
 // ----------------- GOOGLE DRIVE FILE UPLOAD -----------------
